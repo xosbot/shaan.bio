@@ -1,0 +1,737 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:      #08080E;
+  --ink2:     #0F0F18;
+  --surface:  #111118;
+  --border:   rgba(184,149,42,0.12);
+  --gold:     #C4A35A;
+  --gold2:    #8B6914;
+  --cream:    #F2EDE4;
+  --warm:     #BFB8AC;
+  --muted:    #6B6660;
+  --faint:    rgba(242,237,228,0.06);
+
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --body:     'EB Garamond', Georgia, serif;
+  --mono:     'DM Mono', monospace;
+  --sans:     'DM Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 18px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--gold2); color: var(--cream); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: var(--gold2); }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes goldPulse {
+  0%, 100% { opacity: 0.4; } 50% { opacity: 1; }
+}
+@keyframes drift {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes scanH {
+  0%   { transform: translateY(-100vh); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.12s; }
+.reveal-delay-2 { transition-delay: 0.24s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+.reveal-delay-4 { transition-delay: 0.48s; }
+.reveal-delay-5 { transition-delay: 0.60s; }
+.reveal-delay-6 { transition-delay: 0.72s; }
+
+.gold { color: var(--gold); }
+.muted { color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; }
+
+.section-rule {
+  width: 48px; height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.display {
+  font-family: var(--serif);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.08;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+.nav-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.25s;
+}
+.nav-link:hover { color: var(--cream); }
+
+.venture-card {
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  background: transparent;
+  transition: background 0.35s, border-color 0.35s;
+  cursor: default;
+  position: relative;
+}
+.venture-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold2), transparent);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.venture-card:hover {
+  background: var(--faint);
+  border-color: rgba(184,149,42,0.3);
+}
+.venture-card:hover::before { opacity: 1; }
+
+.input-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(184,149,42,0.25);
+  padding: 12px 0;
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 17px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.input-field::placeholder { color: var(--muted); }
+.input-field:focus { border-color: var(--gold); }
+
+.btn-submit {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid rgba(184,149,42,0.4);
+  padding: 16px 40px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-submit:hover {
+  background: rgba(184,149,42,0.08);
+  border-color: var(--gold);
+}
+
+/* ─── Responsive utility classes ─────────────────────────────────────────── */
+
+.nav-pad { padding-left: 60px; padding-right: 60px; }
+.section-pad { padding-top: 140px; padding-bottom: 140px; }
+.section-inner { max-width: 1320px; margin: 0 auto; }
+.grid-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 100px; align-items: start; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: start; }
+.hero-eyebrow-row { display: flex; align-items: center; gap: 16px; }
+.hero-stats { display: flex; gap: 48px; flex-wrap: wrap; }
+.nav-links { display: flex; gap: 36px; }
+.nav-label { display: inline; }
+.nav-burger { display: none; }
+.side-vertical { position: absolute; right: 60px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+
+@media (max-width: 900px) {
+  .grid-3 { grid-template-columns: 1fr !important; }
+  .grid-2 { grid-template-columns: 1fr !important; gap: 60px !important; }
+  .contact-grid { grid-template-columns: 1fr !important; gap: 60px !important; }
+  .hero-name { font-size: clamp(3rem, 14vw, 8rem) !important; }
+}
+
+@media (max-width: 720px) {
+  .nav-pad, .section-pad { padding-left: 24px !important; padding-right: 24px !important; }
+  .section-pad { padding-top: 80px !important; padding-bottom: 80px !important; }
+  .nav-label { display: none; }
+  .nav-links { display: none; }
+  .nav-burger {
+    display: flex !important;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: 1px solid rgba(184,149,42,0.3);
+    width: 40px; height: 40px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .nav-burger span { display: block; width: 16px; height: 1px; background: var(--gold); }
+  .side-vertical { display: none !important; }
+  .hero-stats { gap: 28px !important; }
+  .hero-stats > div { min-width: 80px; }
+  .venture-card, .innovations-card, .works-card, .recognition-card, .contact-form, .contact-success, .academic-block {
+    padding: 32px 24px !important;
+  }
+  .domain-tag-list { gap: 8px !important; }
+  .domain-tag-list > span { padding: 6px 12px !important; font-size: 10px !important; }
+}
+
+@media (max-width: 420px) {
+  .nav-pad, .section-pad { padding-left: 18px !important; padding-right: 18px !important; }
+  .section-pad { padding-top: 64px !important; padding-bottom: 64px !important; }
+  .hero-eyebrow-row { font-size: 9px !important; letter-spacing: 0.3em !important; }
+  .innovations-grid { grid-template-columns: 1fr !important; }
+  .patent-stats { grid-template-columns: 1fr 1fr !important; }
+  .academic-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .recognition-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Safe areas (notched phones, iOS home indicator) ──────────────────────── */
+
+.nav-fixed {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.nav-drawer,
+.nav-fixed {
+  padding-left: max(env(safe-area-inset-left, 0px), var(--gutter-x, 0px));
+  padding-right: max(env(safe-area-inset-right, 0px), var(--gutter-x, 0px));
+}
+
+.section-pad {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-name { font-size: clamp(2.5rem, 10vw, 5rem) !important; }
+  .section-pad { padding-top: 48px !important; padding-bottom: 48px !important; }
+}
+
+/* ─── Input mode: touch vs hover ──────────────────────────────────────────── */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Touch: bump the form action to full width so thumbs land it. */
+  .btn-submit {
+    width: 100%;
+    min-height: 52px;
+  }
+
+  /* Touch: kill the hover-only underline shift; the focus ring carries it. */
+  .project-link:hover,
+  .venture-card:hover {
+    background: transparent;
+    border-color: var(--border);
+  }
+  .project-link:hover > span:last-child { transform: none; }
+
+  /* Touch: domain chips have no hover affordance. */
+  .domain-tag-list > span:hover {
+    color: var(--muted);
+    border-color: var(--border);
+    background: transparent;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* Mouse: tighten the focus ring so keyboard users still see it. */
+  .nav-link:focus-visible,
+  .project-link:focus-visible {
+    outline-offset: 4px;
+  }
+}
+
+/* ─── Container queries: venture card adapts in narrow sidebars ──────────── */
+
+@container (max-width: 320px) {
+  .venture-card {
+    padding: 20px 16px;
+  }
+  .venture-card h3 { font-size: 1rem; }
+}
+
+.venture-card { container-type: inline-size; }
+
+/* ─── Wide layouts: keep the hero from stretching into a poster ──────────── */
+
+@media (min-width: 1600px) {
+  .section-inner { max-width: 1480px; }
+  .hero-stats > div { min-width: 120px; }
+}
+
+@media (min-width: 2200px) {
+  .section-inner { max-width: 1640px; }
+  .hero-name { letter-spacing: -0.02em; }
+}
+
+/* ─── High-contrast / forced-colors fallback ──────────────────────────────── */
+
+@media (forced-colors: active) {
+  :focus-visible { outline: 3px solid CanvasText; }
+  .nav-burger span { background: CanvasText; }
+  .venture-card { border: 1px solid CanvasText; }
+}
+
+/* ─── Interaction: hover / active / focus / disabled ──────────────────────── */
+
+.btn-submit:disabled,
+.btn-submit[aria-busy="true"] {
+  pointer-events: none;
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.input-field:hover,
+select:hover,
+textarea:hover {
+  border-bottom-color: rgba(196, 163, 90, 0.5) !important;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus {
+  border-bottom-color: var(--gold) !important;
+}
+
+.input-field[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-bottom-color: #C97A6E !important;
+}
+
+.project-link {
+  position: relative;
+  transition: color 0.25s, padding-left 0.25s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.project-link:hover,
+.project-link:focus-visible {
+  color: var(--gold) !important;
+  padding-left: 8px;
+}
+
+.project-link:hover > span:last-child,
+.project-link:focus-visible > span:last-child {
+  color: var(--gold) !important;
+  transform: translateX(2px);
+  transition: transform 0.25s, color 0.25s;
+}
+
+.project-link > span:last-child {
+  transition: transform 0.25s, color 0.25s;
+}
+
+/* Burger animation: bars rotate to X when open */
+.nav-burger {
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.nav-burger:hover,
+.nav-burger:focus-visible {
+  border-color: var(--gold) !important;
+  background: rgba(184, 149, 42, 0.06);
+}
+
+.nav-burger[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-burger[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.nav-burger[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+.nav-burger span {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+}
+
+/* Domain tag chips: keyboard focus parity */
+.domain-tag-list > span {
+  cursor: default;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.domain-tag-list > span:hover,
+.domain-tag-list > span:focus-visible {
+  color: var(--gold) !important;
+  border-color: rgba(184, 149, 42, 0.35) !important;
+  background: rgba(184, 149, 42, 0.04);
+}
+
+/* Venture card: keyboard focus parity with hover */
+.venture-card {
+  min-height: 44px;
+}
+
+.venture-card:focus-within {
+  background: var(--faint);
+  border-color: rgba(184, 149, 42, 0.3);
+}
+
+.venture-card:focus-within::before {
+  opacity: 1;
+}
+
+/* Success animation */
+@keyframes successPulse {
+  0%   { transform: scale(0.92); opacity: 0; }
+  60%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.contact-success > div:first-child {
+  animation: successPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-success > div:first-child,
+  .nav-burger span,
+  .project-link > span:last-child,
+  .nav-drawer,
+  .nav-drawer .nav-link,
+  .input-field,
+  .btn-submit,
+  .venture-card::before,
+  .domain-tag-list > span,
+  .hero-stats > div,
+  .section-rule,
+  .eyebrow {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ─── Motion system ────────────────────────────────────────────────────────── */
+
+/* Page-wide timing tokens. 150ms is the tactile baseline. */
+:root {
+  --t-fast:   100ms;
+  --t-base:   150ms;
+  --t-press:  180ms;
+  --t-reveal: 200ms;
+  --t-menu:   250ms;
+  --t-drawer: 300ms;
+  --t-page:   400ms;
+  --t-spin:   800ms;
+
+  /* Material: cubic-bezier(0.16, 1, 0.3, 1) is the project’s expo-out curve.
+     Sharp deceleration, no bounce. Default for arrivals and UI motion. */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:   cubic-bezier(0.4, 0, 1, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Press feedback on the primary CTA. Subtle, immediate, leaves. */
+.btn-submit {
+  transition:
+    background var(--t-press) var(--ease-out),
+    border-color var(--t-press) var(--ease-out),
+    color var(--t-press) var(--ease-out),
+    transform var(--t-fast) var(--ease-out) !important;
+  will-change: transform;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  transition: transform var(--t-fast) var(--ease-in) !important;
+}
+
+/* Form field focus ring: appears, holds, leaves. No linear transition. */
+.input-field,
+select,
+textarea {
+  transition:
+    border-color var(--t-base) var(--ease-out),
+    color var(--t-base) var(--ease-out) !important;
+}
+
+/* Link and chip micro-interactions share the same vocabulary. */
+.nav-link,
+.project-link,
+.venture-card,
+.domain-tag-list > span {
+  transition:
+    color var(--t-base) var(--ease-out),
+    border-color var(--t-base) var(--ease-out),
+    background var(--t-base) var(--ease-out),
+    padding-left var(--t-base) var(--ease-out),
+    transform var(--t-base) var(--ease-out) !important;
+}
+
+/* Venture card press: sink, then settle. Reads as physical without theater. */
+.venture-card {
+  will-change: transform;
+}
+
+.venture-card:active {
+  transform: scale(0.995);
+}
+
+/* Hero entrance: a tighter curve beats the source's linear 1.2s ease. */
+.hero-name,
+.hero-eyebrow-row,
+.hero-stats > div {
+  animation-timing-function: var(--ease-out) !important;
+  animation-fill-mode: both !important;
+}
+
+/* Scroll cue pulse: keep, but tighten so it does not feel metronomic. */
+@keyframes goldPulse {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50%      { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* Reveal cascade: stagger with intent, not arithmetic. */
+.reveal {
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out) !important;
+}
+
+.reveal-delay-1 { transition-delay: calc(var(--t-base) * 1)  !important; }
+.reveal-delay-2 { transition-delay: calc(var(--t-base) * 2)  !important; }
+.reveal-delay-3 { transition-delay: calc(var(--t-base) * 3)  !important; }
+.reveal-delay-4 { transition-delay: calc(var(--t-base) * 4)  !important; }
+.reveal-delay-5 { transition-delay: calc(var(--t-base) * 5)  !important; }
+.reveal-delay-6 { transition-delay: calc(var(--t-base) * 6)  !important; }
+
+/* Nav drawer: slide from top, contents stagger in. */
+.nav-drawer {
+  animation: navDrawerIn var(--t-drawer) var(--ease-out) both;
+}
+
+@keyframes navDrawerIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.nav-drawer .nav-link {
+  opacity: 0;
+  transform: translateY(-4px);
+  animation: navLinkIn var(--t-menu) var(--ease-out) forwards;
+}
+
+.nav-drawer .nav-link:nth-child(1) { animation-delay:  60ms; }
+.nav-drawer .nav-link:nth-child(2) { animation-delay: 100ms; }
+.nav-drawer .nav-link:nth-child(3) { animation-delay: 140ms; }
+.nav-drawer .nav-link:nth-child(4) { animation-delay: 180ms; }
+.nav-drawer .nav-link:nth-child(5) { animation-delay: 220ms; }
+
+@keyframes navLinkIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Burger bar rotation: keep, but give it a snappier spring for close. */
+.nav-burger span {
+  transition:
+    transform var(--t-menu) var(--ease-snap),
+    opacity   var(--t-fast) var(--ease-out) !important;
+}
+
+/* Form success: 3-beat entrance. Beat 1 appears, beat 2 overshoots, beat 3 settles. */
+@keyframes successPulse {
+  0%   { transform: scale(0.92); opacity: 0; }
+  60%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* Form error shake: brief, lateral, intentional. Not a celebration. */
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-4px); }
+  40%      { transform: translateX(4px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(2px); }
+}
+
+[role="alert"]:not([role="status"]) {
+  animation: errorShake 320ms var(--ease-out) both;
+}
+
+/* Loading spinner: deterministic 800ms rotation, no easing on the spin itself. */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-submit[aria-busy="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 10px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: spin var(--t-spin) linear infinite;
+}
+
+/* Venture card top-edge wipe on hover/focus: sweeps in from the left. */
+.venture-card::before {
+  transition:
+    opacity var(--t-base) var(--ease-out),
+    transform var(--t-menu) var(--ease-out) !important;
+  transform: scaleX(0.3);
+  transform-origin: left center;
+}
+
+.venture-card:hover::before,
+.venture-card:focus-within::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Section rule: draws on intersection. Cheap, intentional. */
+.section-rule {
+  animation: ruleIn var(--t-reveal) var(--ease-out) both;
+  transform-origin: left center;
+}
+
+@keyframes ruleIn {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+/* Eyebrow: settles in with the section. */
+.eyebrow {
+  animation: eyebrowIn var(--t-reveal) var(--ease-out) both;
+  animation-delay: 60ms;
+}
+
+@keyframes eyebrowIn {
+  from { transform: translateY(4px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* Hero stat counters: stagger cascade. Mechanical patterns read as fake,
+   so the jitter is real within a tight band. */
+.hero-stats > div {
+  animation: statIn 600ms var(--ease-out) both;
+}
+
+.hero-stats > div:nth-child(1) { animation-delay: 720ms; }
+.hero-stats > div:nth-child(2) { animation-delay: 760ms; }
+.hero-stats > div:nth-child(3) { animation-delay: 800ms; }
+.hero-stats > div:nth-child(4) { animation-delay: 840ms; }
+
+@keyframes statIn {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* Domain tag chip: tiny press feedback so users feel the touch. */
+.domain-tag-list > span:active {
+  transform: scale(0.97);
+}
+
+/* Project link arrow: translates with intent, not magic. */
+.project-link > span:last-child {
+  transition:
+    transform var(--t-base) var(--ease-out),
+    color var(--t-base) var(--ease-out) !important;
+}
+
+.project-link:hover > span:last-child,
+.project-link:focus-visible > span:last-child {
+  transform: translateX(4px);
+}
+
+/* Form → success state transition. The form fades and shrinks; the
+   success card enters with the 3-beat pulse above. */
+.contact-form,
+.contact-success {
+  animation: stateEnter var(--t-menu) var(--ease-out) both;
+}
+
+@keyframes stateEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Per-field error appears, not drops. */
+[role="alert"][id^="err-"] {
+  animation: errorIn var(--t-reveal) var(--ease-out) both;
+}
+
+@keyframes errorIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect the user's system preference last, so it can override any of the
+   above. Spatial movement collapses to opacity-only fades. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

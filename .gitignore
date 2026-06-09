@@ -51,3 +51,4 @@ Thumbs.db
 # PyTest cache
 .pytest_cache/
 ```
+.vercel

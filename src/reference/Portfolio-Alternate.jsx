@@ -1,5 +1,194 @@
 import { useState, useEffect, useRef } from "react";
-import { Analytics } from "@vercel/analytics/react";
+
+// ─── GLOBAL STYLES ────────────────────────────────────────────────────────────
+const Styles = () => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #08080E;
+      --ink2:     #0F0F18;
+      --surface:  #111118;
+      --border:   rgba(184,149,42,0.12);
+      --gold:     #C4A35A;
+      --gold2:    #8B6914;
+      --cream:    #F2EDE4;
+      --warm:     #BFB8AC;
+      --muted:    #6B6660;
+      --faint:    rgba(242,237,228,0.06);
+
+      --serif:    'Cormorant Garamond', Georgia, serif;
+      --body:     'EB Garamond', Georgia, serif;
+      --mono:     'DM Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: var(--body);
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--gold2); color: var(--cream); }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--ink); }
+    ::-webkit-scrollbar-thumb { background: var(--gold2); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes goldPulse {
+      0%, 100% { opacity: 0.4; } 50% { opacity: 1; }
+    }
+    @keyframes drift {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+    @keyframes scanH {
+      0%   { transform: translateY(-100vh); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.12s; }
+    .reveal-delay-2 { transition-delay: 0.24s; }
+    .reveal-delay-3 { transition-delay: 0.36s; }
+    .reveal-delay-4 { transition-delay: 0.48s; }
+    .reveal-delay-5 { transition-delay: 0.60s; }
+    .reveal-delay-6 { transition-delay: 0.72s; }
+
+    .gold { color: var(--gold); }
+    .muted { color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; }
+
+    .section-rule {
+      width: 48px; height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .display {
+      font-family: var(--serif);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      line-height: 1.08;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .nav-link {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.25s;
+    }
+    .nav-link:hover { color: var(--cream); }
+
+    .venture-card {
+      border: 1px solid var(--border);
+      padding: 32px 28px;
+      background: transparent;
+      transition: background 0.35s, border-color 0.35s;
+      cursor: default;
+      position: relative;
+    }
+    .venture-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold2), transparent);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    .venture-card:hover {
+      background: var(--faint);
+      border-color: rgba(184,149,42,0.3);
+    }
+    .venture-card:hover::before { opacity: 1; }
+
+    .input-field {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(184,149,42,0.25);
+      padding: 12px 0;
+      color: var(--cream);
+      font-family: var(--body);
+      font-size: 17px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .input-field::placeholder { color: var(--muted); }
+    .input-field:focus { border-color: var(--gold); }
+
+    .btn-submit {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(184,149,42,0.4);
+      padding: 16px 40px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-submit:hover {
+      background: rgba(184,149,42,0.08);
+      border-color: var(--gold);
+    }
+
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: 1fr !important; }
+      .grid-2 { grid-template-columns: 1fr !important; }
+      .hero-name { font-size: clamp(3.5rem, 14vw, 9rem) !important; }
+    }
+  `}</style>
+);
 
 // ─── GRAVITY CANVAS ───────────────────────────────────────────────────────────
 const GravityCanvas = () => {
@@ -203,20 +392,23 @@ const Hero = () => (
     }} />
 
     {/* Content */}
-    <div className="nav-pad" style={{
+    <div style={{
       position: "relative", zIndex: 10,
       width: "100%", maxWidth: "1320px",
-      margin: "0 auto",
+      margin: "0 auto", padding: "0 60px",
     }}>
       {/* Eyebrow */}
-      <div className="hero-eyebrow-row" style={{
+      <div style={{
         fontFamily: "var(--mono)",
         fontSize: "10px",
         letterSpacing: "0.4em",
         color: "var(--gold)",
         textTransform: "uppercase",
         marginBottom: "48px",
-        animation: "fadeIn 800ms cubic-bezier(0.16,1,0.3,1) both",
+        animation: "fadeIn 1.2s ease both",
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
       }}>
         <span style={{ display: "inline-block", width: "32px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
         Corporate Consultant · Inventor · Strategic Catalyst
@@ -336,12 +528,12 @@ const Hero = () => (
 
 // ─── ABOUT ────────────────────────────────────────────────────────────────────
 const About = () => (
-  <section id="about" className="section-pad" style={{ background: "var(--ink)", maxWidth: "1320px", margin: "0 auto" }}>
-    <div className="grid-2">
+  <section id="about" style={{ padding: "140px 60px", background: "var(--ink)", maxWidth: "1320px", margin: "0 auto" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "100px", alignItems: "start" }}>
 
       {/* Left — Photo placeholder + credentials strip */}
       <div className="reveal">
-        {/* Photo */}
+        {/* Photo placeholder */}
         <div style={{
           width: "100%",
           paddingBottom: "130%",
@@ -351,18 +543,40 @@ const About = () => (
           marginBottom: "32px",
           overflow: "hidden",
         }}>
-          <img
-            src="/photo-profile.jpg"
-            alt="Dr. Shaan Sherif"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center top",
-            }}
-          />
+          {/* Placeholder content */}
+          <div style={{
+            position: "absolute", inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "16px",
+          }}>
+            {/* Monogram */}
+            <div style={{
+              width: "80px", height: "80px",
+              border: "1px solid rgba(184,149,42,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{
+                fontFamily: "var(--serif)",
+                fontSize: "2.5rem",
+                fontWeight: 300,
+                color: "rgba(184,149,42,0.4)",
+              }}>S</span>
+            </div>
+            <div style={{
+              fontFamily: "var(--mono)",
+              fontSize: "9px",
+              letterSpacing: "0.25em",
+              color: "var(--muted)",
+              textTransform: "uppercase",
+              textAlign: "center",
+              lineHeight: 2,
+            }}>
+              Professional<br />Portrait<br />Placeholder
+            </div>
+          </div>
 
           {/* Corner accents */}
           {[["0","0","top","left"],["0","0","top","right"],["0","0","bottom","left"],["0","0","bottom","right"]].map(([t,r,pos1,pos2],i) => {
@@ -815,6 +1029,8 @@ const Innovations = () => (
               transition: "color 0.25s, border-color 0.25s",
               cursor: "default",
             }}
+              onMouseEnter={e => { e.target.style.color = "var(--gold)"; e.target.style.borderColor = "rgba(184,149,42,0.35)"; }}
+              onMouseLeave={e => { e.target.style.color = "var(--muted)"; e.target.style.borderColor = "var(--border)"; }}
             >{d}</span>
           ))}
         </div>
@@ -1036,87 +1252,17 @@ const Recognition = () => (
   </section>
 );
 
-// ─── CONTACT ───────────────────────────────────────────────────────────
+// ─── CONTACT ─────────────────────────────────────────────────────────────────
 const Contact = () => {
   const [form, setForm] = useState({ name: "", org: "", email: "", type: "investor", message: "" });
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+  const [sent, setSent] = useState(false);
 
-  const validate = (values) => {
-    const e = {};
-    if (!values.name.trim()) e.name = "Required";
-    if (!values.org.trim()) e.org = "Required";
-    if (!values.email.trim()) e.email = "Required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) e.email = "Enter a valid email";
-    if (!values.message.trim() || values.message.trim().length < 10) e.message = "Brief context helps us route this (min 10 chars)";
-    return e;
-  };
-
-  const handleChange = (k) => (e) => {
-    const next = { ...form, [k]: e.target.value };
-    setForm(next);
-    if (touched[k]) setErrors(validate(next));
-  };
-
-  const handleBlur = (k) => () => {
-    setTouched(t => ({ ...t, [k]: true }));
-    setErrors(validate(form));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const eMap = validate(form);
-    setErrors(eMap);
-    setTouched({ name: true, org: true, email: true, message: true });
-    if (Object.keys(eMap).length) return;
-    setStatus("sending");
-    try {
-      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (res.ok) setStatus("sent");
-      else setStatus("error");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  const handleReset = () => {
-    setForm({ name: "", org: "", email: "", type: "investor", message: "" });
-    setErrors({});
-    setTouched({});
-    setStatus("idle");
-  };
-
-  const fieldStyle = (k) => ({
-    width: "100%",
-    background: "transparent",
-    border: "none",
-    borderBottom: `1px solid ${errors[k] && touched[k] ? "#C97A6E" : "rgba(184,149,42,0.25)"}`,
-    padding: "12px 0",
-    color: "var(--cream)",
-    fontFamily: "var(--body)",
-    fontSize: "17px",
-    outline: "none",
-    cursor: "pointer",
-    transition: "border-color 0.25s",
-  });
-
-  const ErrorLine = ({ k }) =>
-    errors[k] && touched[k] ? (
-      <div role="alert" style={{
-        fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.1em",
-        color: "#C97A6E", marginTop: "8px", textTransform: "uppercase",
-      }}>{errors[k]}</div>
-    ) : null;
+  const handleSubmit = e => { e.preventDefault(); setSent(true); };
 
   return (
-    <section id="contact" className="section-pad" style={{ background: "var(--ink2)" }}>
-      <div className="section-inner">
-        <div className="contact-grid">
+    <section id="contact" style={{ padding: "140px 60px", background: "var(--ink2)" }}>
+      <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "120px", alignItems: "start" }}>
 
           {/* Left */}
           <div>
@@ -1136,204 +1282,191 @@ const Contact = () => {
             </div>
 
             <div className="reveal reveal-delay-1" style={{
-              fontFamily: "var(--sans)", fontSize: "15px", color: "var(--muted)",
-              lineHeight: 1.9, fontWeight: 300, marginBottom: "56px",
+              fontFamily: "var(--sans)",
+              fontSize: "15px",
+              color: "var(--muted)",
+              lineHeight: 1.9,
+              fontWeight: 300,
+              marginBottom: "56px",
             }}>
               <p style={{ marginBottom: "20px" }}>
                 Dr. Shaan Sherif engages with a select number of investors, sovereign partners,
                 and institutional collaborators each year. If you are exploring capital deployment
                 across aerospace, deep technology, or frontier systems — this is the right conversation.
               </p>
-              <p>All enquiries are reviewed personally. Responses are extended to qualified principals.</p>
+              <p>
+                All enquiries are reviewed personally. Responses are extended to qualified principals.
+              </p>
             </div>
 
             {/* Contact details */}
             <div className="reveal reveal-delay-2">
               {[
-                ["Nature of Engagement", "Investor Relations · Strategic Partnership · Advisory · Consultation"],
+                ["Nature of Engagement", "Investor Relations · Strategic Partnership · Advisory"],
                 ["Response Protocol", "Qualified principals within 5 business days"],
                 ["Confidentiality", "All enquiries treated as strictly confidential"],
-                ["LinkedIn", "linkedin.com/in/shaan-sherif-2585583a8"],
-                ["Medium", "medium.com/@drshansherif"],
-                ["Email", "contact@drshaansherif.com"],
               ].map(([label, val]) => (
-                <div key={label} style={{ padding: "20px 0", borderBottom: "1px solid var(--border)" }}>
+                <div key={label} style={{
+                  padding: "20px 0",
+                  borderBottom: "1px solid var(--border)",
+                }}>
                   <div style={{
-                    fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.2em",
-                    color: "var(--gold)", textTransform: "uppercase", marginBottom: "6px",
+                    fontFamily: "var(--mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.2em",
+                    color: "var(--gold)",
+                    textTransform: "uppercase",
+                    marginBottom: "6px",
                   }}>{label}</div>
-                  <div style={{ fontFamily: "var(--sans)", fontSize: "13px", color: "var(--warm)", fontWeight: 300 }}>{val}</div>
+                  <div style={{
+                    fontFamily: "var(--sans)",
+                    fontSize: "13px",
+                    color: "var(--warm)",
+                    fontWeight: 300,
+                  }}>{val}</div>
                 </div>
               ))}
-            </div>
-
-            {/* Project Links */}
-            <div className="reveal reveal-delay-2" style={{ marginTop: "40px" }}>
-              <div style={{
-                fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.2em",
-                color: "var(--gold)", textTransform: "uppercase", marginBottom: "16px",
-              }}>Explore Ventures</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {[
-                  { name: "Harver Space Industries", url: "https://harver-space-industries.vercel.app" },
-                  { name: "Harver Foundation", url: "https://frontend-xosbot-team.vercel.app" },
-                  { name: "Xcrow — Digital Escrow", url: "https://xcrow-ten.vercel.app" },
-                  { name: "Noir/Vault", url: "https://crypto-card-red.vercel.app" },
-                  { name: "13o3", url: "https://13o3.com" },
-                ].map(p => (
-                  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" className="project-link" style={{
-                    fontFamily: "var(--sans)", fontSize: "13px", color: "var(--cream)",
-                    textDecoration: "none", padding: "8px 0", borderBottom: "1px solid var(--border)",
-                    cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
-                  }}>
-                    <span>{p.name}</span>
-                    <span style={{ fontFamily: "var(--mono)", fontSize: "10px", color: "var(--muted)" }}>→</span>
-                  </a>
-                ))}
-              </div>
             </div>
           </div>
 
           {/* Right — Form */}
           <div className="reveal reveal-delay-2">
-            {status === "sent" ? (
-              <div className="contact-success" role="status" aria-live="polite" style={{
-                padding: "80px 60px", border: "1px solid var(--border)", textAlign: "center", background: "rgba(184,149,42,0.02)",
+            {sent ? (
+              <div style={{
+                padding: "80px 60px",
+                border: "1px solid var(--border)",
+                textAlign: "center",
               }}>
                 <div style={{
-                  fontFamily: "var(--serif)", fontSize: "3rem", fontWeight: 300,
-                  color: "var(--gold)", marginBottom: "16px",
+                  fontFamily: "var(--serif)",
+                  fontSize: "3rem",
+                  fontWeight: 300,
+                  color: "var(--gold)",
+                  marginBottom: "16px",
                 }}>✦</div>
                 <h3 style={{
-                  fontFamily: "var(--serif)", fontSize: "1.5rem", fontWeight: 300,
-                  color: "var(--cream)", marginBottom: "16px", fontStyle: "italic",
+                  fontFamily: "var(--serif)",
+                  fontSize: "1.5rem",
+                  fontWeight: 300,
+                  color: "var(--cream)",
+                  marginBottom: "16px",
+                  fontStyle: "italic",
                 }}>Enquiry Received</h3>
-                <p style={{ fontFamily: "var(--sans)", fontSize: "13px", color: "var(--muted)", fontWeight: 300, lineHeight: 1.8, marginBottom: "32px" }}>
+                <p style={{
+                  fontFamily: "var(--sans)",
+                  fontSize: "13px",
+                  color: "var(--muted)",
+                  fontWeight: 300,
+                  lineHeight: 1.8,
+                }}>
                   Your message has been received. Qualified principals
                   will hear from us within five business days.
                 </p>
-                <button type="button" onClick={handleReset} className="btn-submit">Send another enquiry</button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} noValidate className="contact-form" aria-busy={status === "sending"} style={{
-                padding: "48px 52px", border: "1px solid var(--border)", background: "rgba(184,149,42,0.02)",
-              }}>
+              <form onSubmit={handleSubmit} style={{ padding: "48px 52px", border: "1px solid var(--border)", background: "rgba(184,149,42,0.02)" }}>
                 <div style={{
-                  fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.3em",
-                  color: "var(--muted)", textTransform: "uppercase", marginBottom: "40px",
-                }}>Investor &amp; Partner Enquiry</div>
+                  fontFamily: "var(--mono)",
+                  fontSize: "10px",
+                  letterSpacing: "0.3em",
+                  color: "var(--muted)",
+                  textTransform: "uppercase",
+                  marginBottom: "40px",
+                }}>Investor & Partner Enquiry</div>
 
                 {[
-                  { key: "name", label: "Full Name", type: "text", placeholder: "Your name", autoComplete: "name" },
-                  { key: "org", label: "Organization", type: "text", placeholder: "Fund / Institution / Corporation", autoComplete: "organization" },
-                  { key: "email", label: "Email Address", type: "email", placeholder: "your@address.com", autoComplete: "email" },
+                  { key: "name", label: "Full Name", type: "text", placeholder: "Your name" },
+                  { key: "org", label: "Organization", type: "text", placeholder: "Fund / Institution / Corporation" },
+                  { key: "email", label: "Email Address", type: "email", placeholder: "your@address.com" },
                 ].map(f => (
-                  <div key={f.key} style={{ marginBottom: "12px" }}>
-                    <label htmlFor={`field-${f.key}`} style={{
-                      fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.2em",
-                      color: "var(--muted)", textTransform: "uppercase",
-                      display: "block", marginBottom: "10px",
+                  <div key={f.key} style={{ marginBottom: "36px" }}>
+                    <label style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "10px",
+                      letterSpacing: "0.2em",
+                      color: "var(--muted)",
+                      textTransform: "uppercase",
+                      display: "block",
+                      marginBottom: "10px",
                     }}>{f.label}</label>
                     <input
-                      id={`field-${f.key}`}
                       type={f.type}
                       placeholder={f.placeholder}
                       value={form[f.key]}
-                      onChange={handleChange(f.key)}
-                      onBlur={handleBlur(f.key)}
-                      autoComplete={f.autoComplete}
-                      aria-invalid={Boolean(errors[f.key] && touched[f.key])}
-                      aria-describedby={errors[f.key] && touched[f.key] ? `err-${f.key}` : undefined}
+                      onChange={e => setForm({ ...form, [f.key]: e.target.value })}
+                      required
                       className="input-field"
-                      style={{
-                        width: "100%", background: "transparent", border: "none",
-                        borderBottom: `1px solid ${errors[f.key] && touched[f.key] ? "#C97A6E" : "rgba(184,149,42,0.25)"}`,
-                        padding: "12px 0", color: "var(--cream)", fontFamily: "var(--body)",
-                        fontSize: "17px", outline: "none", transition: "border-color 0.25s",
-                      }}
                     />
-                    {errors[f.key] && touched[f.key] && (
-                      <div id={`err-${f.key}`} role="alert" style={{
-                        fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.1em",
-                        color: "#C97A6E", marginTop: "8px", textTransform: "uppercase",
-                      }}>{errors[f.key]}</div>
-                    )}
                   </div>
                 ))}
 
-                <div style={{ marginBottom: "12px" }}>
-                  <label htmlFor="field-type" style={{
-                    fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.2em",
-                    color: "var(--muted)", textTransform: "uppercase",
-                    display: "block", marginBottom: "10px",
+                <div style={{ marginBottom: "36px" }}>
+                  <label style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.2em",
+                    color: "var(--muted)",
+                    textTransform: "uppercase",
+                    display: "block",
+                    marginBottom: "10px",
                   }}>Nature of Enquiry</label>
                   <select
-                    id="field-type"
                     value={form.type}
-                    onChange={handleChange("type")}
-                    style={fieldStyle("type")}
+                    onChange={e => setForm({ ...form, type: e.target.value })}
+                    style={{
+                      width: "100%",
+                      background: "transparent",
+                      border: "none",
+                      borderBottom: "1px solid rgba(184,149,42,0.25)",
+                      padding: "12px 0",
+                      color: "var(--cream)",
+                      fontFamily: "var(--body)",
+                      fontSize: "17px",
+                      outline: "none",
+                      cursor: "pointer",
+                    }}
                   >
-                    <option value="consultation" style={{ background: "#0F0F18" }}>Consultation / Meeting Booking</option>
                     <option value="investor" style={{ background: "#0F0F18" }}>Investment Discussion</option>
                     <option value="partner" style={{ background: "#0F0F18" }}>Strategic Partnership</option>
                     <option value="advisory" style={{ background: "#0F0F18" }}>Advisory Engagement</option>
                     <option value="sovereign" style={{ background: "#0F0F18" }}>Sovereign / Institutional</option>
-                    <option value="media" style={{ background: "#0F0F18" }}>Media &amp; Speaking</option>
+                    <option value="media" style={{ background: "#0F0F18" }}>Media & Speaking</option>
                   </select>
                 </div>
 
-                <div style={{ marginBottom: "32px" }}>
-                  <label htmlFor="field-message" style={{
-                    fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.2em",
-                    color: "var(--muted)", textTransform: "uppercase",
-                    display: "block", marginBottom: "10px",
+                <div style={{ marginBottom: "48px" }}>
+                  <label style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.2em",
+                    color: "var(--muted)",
+                    textTransform: "uppercase",
+                    display: "block",
+                    marginBottom: "10px",
                   }}>Message</label>
                   <textarea
-                    id="field-message"
                     rows={4}
                     placeholder="Briefly describe your interest or proposal..."
                     value={form.message}
-                    onChange={handleChange("message")}
-                    onBlur={handleBlur("message")}
-                    aria-invalid={Boolean(errors.message && touched.message)}
-                    aria-describedby={errors.message && touched.message ? "err-message" : undefined}
+                    onChange={e => setForm({ ...form, message: e.target.value })}
                     style={{
-                      width: "100%", background: "transparent", border: "none",
-                      borderBottom: `1px solid ${errors.message && touched.message ? "#C97A6E" : "rgba(184,149,42,0.25)"}`,
-                      padding: "12px 0", color: "var(--cream)", fontFamily: "var(--sans)",
-                      fontSize: "14px", outline: "none", resize: "none", fontWeight: 300, transition: "border-color 0.25s",
+                      width: "100%",
+                      background: "transparent",
+                      border: "none",
+                      borderBottom: "1px solid rgba(184,149,42,0.25)",
+                      padding: "12px 0",
+                      color: "var(--cream)",
+                      fontFamily: "var(--sans)",
+                      fontSize: "14px",
+                      outline: "none",
+                      resize: "none",
+                      fontWeight: 300,
                     }}
                   />
-                  {errors.message && touched.message && (
-                    <div id="err-message" role="alert" style={{
-                      fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.1em",
-                      color: "#C97A6E", marginTop: "8px", textTransform: "uppercase",
-                    }}>{errors.message}</div>
-                  )}
                 </div>
 
-                {status === "error" && (
-                  <div role="alert" style={{
-                    fontFamily: "var(--mono)", fontSize: "10px", letterSpacing: "0.15em",
-                    color: "#C97A6E", textTransform: "uppercase", marginBottom: "16px",
-                    padding: "12px 16px", border: "1px solid #C97A6E", background: "rgba(201,122,110,0.06)",
-                  }}>
-                    Submission failed. Check your connection and try again.
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={status === "sending"}
-                  className="btn-submit"
-                  aria-busy={status === "sending"}
-                  style={{
-                    minHeight: "48px", minWidth: "48px",
-                    opacity: status === "sending" ? 0.7 : 1,
-                    cursor: status === "sending" ? "wait" : "pointer",
-                  }}
-                >
-                  {status === "sending" ? "Sending…" : "Submit Enquiry →"}
+                <button type="submit" className="btn-submit">
+                  Submit Enquiry →
                 </button>
               </form>
             )}
@@ -1347,88 +1480,45 @@ const Contact = () => {
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 const Footer = () => (
   <footer style={{
-    padding: "48px 60px 32px",
+    padding: "48px 60px",
     background: "var(--ink)",
     borderTop: "1px solid var(--border)",
   }}>
-    <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
-      {/* Top row */}
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        flexWrap: "wrap", gap: "20px", marginBottom: "32px",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div style={{
-            width: "28px", height: "28px",
-            border: "1px solid rgba(184,149,42,0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ fontFamily: "var(--serif)", fontSize: "14px", color: "var(--gold)", fontWeight: 300 }}>S</span>
-          </div>
-          <span style={{
-            fontFamily: "var(--mono)",
-            fontSize: "10px",
-            letterSpacing: "0.25em",
-            color: "var(--muted)",
-          }}>DR. SHAAN SHERIF</span>
-        </div>
-
+    <div style={{
+      maxWidth: "1320px", margin: "0 auto",
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      flexWrap: "wrap", gap: "20px",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <div style={{
+          width: "28px", height: "28px",
+          border: "1px solid rgba(184,149,42,0.3)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <span style={{ fontFamily: "var(--serif)", fontSize: "14px", color: "var(--gold)", fontWeight: 300 }}>S</span>
+        </div>
+        <span style={{
           fontFamily: "var(--mono)",
           fontSize: "10px",
-          letterSpacing: "0.15em",
-          color: "rgba(107,102,96,0.5)",
-        }}>
-          STRATEGIC CATALYST · THE MAN OF GRAVITY
-        </div>
+          letterSpacing: "0.25em",
+          color: "var(--muted)",
+        }}>DR. SHAAN SHERIF</span>
       </div>
 
-      {/* Social & Project Links */}
       <div style={{
-        display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "24px",
-        padding: "24px 0",
-        borderTop: "1px solid var(--border)",
-        borderBottom: "1px solid var(--border)",
-        marginBottom: "24px",
+        fontFamily: "var(--mono)",
+        fontSize: "10px",
+        letterSpacing: "0.15em",
+        color: "rgba(107,102,96,0.5)",
       }}>
-        {/* Social */}
-        <div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", letterSpacing: "0.2em", color: "var(--gold)", textTransform: "uppercase", marginBottom: "12px" }}>Connect</div>
-          <div style={{ display: "flex", gap: "16px" }}>
-            {[
-              { label: "LinkedIn", href: "https://linkedin.com/in/shaan-sherif-2585583a8" },
-              { label: "X", href: "#" },
-              { label: "Email", href: "mailto:contact@drshaansherif.com" },
-              { label: "Medium", href: "https://medium.com/@drshansherif" },
-            ].map(s => (
-              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="nav-link">{s.label}</a>
-            ))}
-          </div>
-        </div>
-
-        {/* Projects */}
-        <div>
-          <div style={{ fontFamily: "var(--mono)", fontSize: "9px", letterSpacing: "0.2em", color: "var(--gold)", textTransform: "uppercase", marginBottom: "12px" }}>Network</div>
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-            {[
-              { label: "Harver Space", href: "https://harver-space-industries.vercel.app" },
-              { label: "Harver Foundation", href: "https://frontend-xosbot-team.vercel.app" },
-              { label: "Xcrow", href: "https://xcrow-ten.vercel.app" },
-              { label: "Noir/Vault", href: "https://crypto-card-red.vercel.app" },
-            ].map(s => (
-              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="nav-link">{s.label}</a>
-            ))}
-          </div>
-        </div>
+        STRATEGIC CATALYST · THE MAN OF GRAVITY
       </div>
 
-      {/* Copyright */}
       <div style={{
         fontFamily: "var(--mono)",
         fontSize: "10px",
         letterSpacing: "0.15em",
         color: "rgba(107,102,96,0.4)",
-        textAlign: "center",
       }}>
         © {new Date().getFullYear()} — ALL RIGHTS RESERVED
       </div>
@@ -1442,7 +1532,7 @@ export default function App() {
 
   return (
     <>
-      <Analytics />
+      <Styles />
       <Nav />
       <Hero />
       <div className="divider" />
